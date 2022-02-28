@@ -6,34 +6,40 @@
 /*   By: apico-su <apico-su@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/26 17:20:35 by apico-su          #+#    #+#             */
-/*   Updated: 2022/02/26 20:06:12 by apico-su         ###   ########.fr       */
+/*   Updated: 2022/02/28 22:06:35 by apico-su         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-size_t	nbr_hexa(size_t nbr)
+int	nbr_hexa(size_t nbr, char *str)
 {
-	int x;
-	int pos;
-	char a;
-	int y;
-
-	pos = 0;
-	x = 1;
-	while (nbr / (x * 16))
-		x++;
-	while (x >= 1)
+	if (nbr / 16 > 16)
 	{
-		printf("x = %d\nnum = %lu", x, nbr % (x * 16));
-		a = 0;
-		if (nbr % (x * 16) < 10)
-			a = '0' + (nbr % (x * 16));
-		else if (nbr % (x * 16) < 16)
-			a = 'A' - 10 + (nbr % (x * 16));
-		write (1, &a, sizeof(char));
-		x = x / 16;
+		nbr_hexa(nbr / 16, str);
 	}
+	else if (nbr / 16 < 10)
+	{
+		ft_putchar_fd('0' + (nbr / 16), 1);
+		ft_strjoin(str, (char *) '0' + (nbr / 16));
+	}
+	else if (nbr / 6 > 0)
+	{
+		ft_putchar_fd('A' - 10 + (nbr / 16), 1);
+		ft_strjoin(str, (char *) 'A' - 10 + (nbr / 16));
+	}
+	if (nbr % 16 < 10)
+	{
+		ft_putchar_fd('0' + (nbr % 16), 1);
+		ft_strjoin(str, (char *) '0' + (nbr % 16));
+	}
+	else if (nbr % 6 < 16)
+	{
+		ft_putchar_fd('A' - 10 + (nbr % 16), 1);
+		ft_strjoin(str, (char *) 'A' - 10 + (nbr % 16));
+	}
+	ft_putstr_fd(str, 1);
+	return (ft_strlen(str));
 }
 
 static size_t	stringfunct(char *c)
@@ -54,9 +60,11 @@ static size_t	stringfunct(char *c)
 static size_t	pointfunct(void *point)
 {
 	size_t	address;
+	char	*num;
 
+	num = NULL;
 	address = (size_t) point;
-	printf("0x%lx\n%p\n", address, point);
+	nbr_hexa(address, num);
 }
 /*int	ft_printf(const char *format, ...)
 {
@@ -64,11 +72,13 @@ static size_t	pointfunct(void *point)
 
 int	main(int argc, char *argv[])
 {
-	char	n;
+	char	*n;
 	size_t	count;
 
-	n = '\n';
-	nbr_hexa(atoi(argv[1]));
+	printf("%p\n", &n);
+	count = (size_t)&n;
+	ft_putstr_fd("0x", 1);
+	nbr_hexa(count, n);
 	printf("\n");
 	/*if (argc < 2)
 	{
