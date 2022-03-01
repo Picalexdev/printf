@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apico-su <apico-su@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/26 17:20:35 by apico-su          #+#    #+#             */
-/*   Updated: 2022/03/01 18:23:54 by apico-su         ###   ########.fr       */
+/*   Updated: 2022/03/01 19:37:12 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ t_print	initialise(t_print *src)
 	src->padd = 0;
 	src->point = 0;
 	src->dash = 0;
-	src->lenght = 0;
+	src->length = 0;
 	src->minus = 0;
 	src->zero = 0;
 	src->percent = 0;
@@ -77,9 +77,31 @@ static size_t	pointfunct(void *point)
 	address = (size_t) point;
 	nbr_hexa(address, 0);
 }
-/*int	ft_printf(const char *format, ...)
+int	ft_printf(const char *format, ...)
 {
-}*/
+	t_print	*str;
+	int		x;
+	int		count;
+
+	str = (t_print *)malloc(sizeof(t_print));
+	if (!str)
+		return (0);
+	initialise(str);
+	va_start(str->arg, format);
+	x = -1;
+	count = 0;
+	while (format[++x])
+	{
+		if (format[x] == '%')
+			x = get_format(str, format, x + 1);
+		else
+			count += write(1, format[x], sizeof(char));
+	}
+	va_end(str->arg);
+	count += str->length;
+	free(str);
+	return (count);
+}
 
 int	main(int argc, char *argv[])
 {
