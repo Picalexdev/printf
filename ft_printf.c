@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/26 17:20:35 by apico-su          #+#    #+#             */
-/*   Updated: 2022/03/01 19:37:12 by alex             ###   ########.fr       */
+/*   Updated: 2022/03/01 21:03:28 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,15 @@ t_print	initialise(t_print *src)
 	src->precision = 0;
 	src->padd = 0;
 	src->point = 0;
-	src->dash = 0;
+	src->minus_sign = 0;
 	src->length = 0;
 	src->minus = 0;
 	src->zero = 0;
 	src->percent = 0;
-	src->sp = 0;
+	src->space = 0;
 }
 
-int	nbr_hexa(size_t nbr, int count)
+void	dectohex(size_t nbr, int count)
 {
 	if (nbr / 16 > 16)
 		count = nbr_hexa(nbr / 16, count);
@@ -53,53 +53,85 @@ int	nbr_hexa(size_t nbr, int count)
 	return (count);
 }
 
-static size_t	stringfunct(char *c)
+static void	stringfunct(t_print *save)
+{}
+
+static void decifunct(t_print *save)
+{}
+
+static void	pointfunct(t_print *save)
 {
-	static size_t	check;
-	static size_t	i;
+	int	address;
 
-	check = ft_strlen(c);
-	i = 0;
-	while (i < check)
-	{
-		write(1, &c[i], sizeof(char));
-		i++;
-	}
-	return (check);
-}
-
-static size_t	pointfunct(void *point)
-{
-	size_t	address;
-	char	*num;
-
-	num = NULL;
-	address = (size_t) point;
 	nbr_hexa(address, 0);
 }
+
+static void	numhex(t_print *save, char caps)
+{}
+
+int format_conversion(t_print *save, char *format, int x)
+{
+	if (format[x] == 'c' || format[x] == 's')
+		stringfunct(save);
+	else if (format[x] == 'p')
+		pointfunct(save);
+	else if (format[x] == 'd' || format[x] == 'u')
+		decifunct(save);
+	else if (format[x] == 'x' || format[x] == 'X')
+		numhex(save, format[x]);
+	return (x);
+}
+
+int	get_format(t_print *save, char *format, int x)
+{
+	while (format[x] != 'u' && format[x] != 'd' && format[x] != 'c' &&
+			format[x] != 's' && format[x] != 'u' && format[x] != 'p' &&
+			format[x] != 'x' && format[x] != 'X')
+	{
+		if (format[x] == '.')
+		{
+			save->point = 1;
+			x++;
+		}
+		else if (format[x] == '-')
+		{
+			save->minus_sign = 1;
+			x++;
+		}
+		else if (format[x] == ' ')
+		{
+			save->space = 1;
+			x++;
+		}
+		else if (format[x] == '%')
+			x += percent(save);
+	}
+	return (format_conversion(save, format, x));
+}
+
 int	ft_printf(const char *format, ...)
 {
-	t_print	*str;
+	t_print	*save;
 	int		x;
 	int		count;
 
-	str = (t_print *)malloc(sizeof(t_print));
-	if (!str)
+	save = (t_print *)malloc(sizeof(t_print));
+	if (!save)
 		return (0);
-	initialise(str);
-	va_start(str->arg, format);
+	initialise(save);
+	va_start(save->arg, format);
 	x = -1;
 	count = 0;
 	while (format[++x])
 	{
 		if (format[x] == '%')
-			x = get_format(str, format, x + 1);
+			x = get_format(save, format, x + 1);
 		else
 			count += write(1, format[x], sizeof(char));
 	}
-	va_end(str->arg);
-	count += str->length;
-	free(str);
+	va_end(save->arg);
+	count += save->length;
+	free(save);
 	return (count);
 }
 

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/26 17:23:01 by apico-su          #+#    #+#             */
-/*   Updated: 2022/03/01 19:06:56 by alex             ###   ########.fr       */
+/*   Updated: 2022/03/01 19:52:47 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ typedef struct s_print
 	int			precision;
 	int			padd;
 	int			point;
-	int			dash;
+	int			minus_sign;
 	int			length;
 	int			minus;
 	int			zero;
 	int			percent;
-	int			sp;
+	int			space;
 }	t_print;
 #endif
