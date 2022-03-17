@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/26 17:20:35 by apico-su          #+#    #+#             */
-/*   Updated: 2022/03/01 21:03:28 by alex             ###   ########.fr       */
+/*   Updated: 2022/03/17 20:36:12 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_print	initialise(t_print *src)
 	src->space = 0;
 }
 
-void	dectohex(size_t nbr, int count)
+/*void	dectohex(size_t nbr, int count)
 {
 	if (nbr / 16 > 16)
 		count = nbr_hexa(nbr / 16, count);
@@ -51,42 +51,79 @@ void	dectohex(size_t nbr, int count)
 		count++;
 	}
 	return (count);
+}*/
+
+static int	charfunct(t_print *save)
+{
+	char	c;
+
+	c = va_arg(save->arg, int);
+	ft_putchar_fd(c, 1);
+	return (1);
 }
 
-static void	stringfunct(t_print *save)
-{}
-
-static void decifunct(t_print *save)
-{}
-
-static void	pointfunct(t_print *save)
+static int	stringfunct(t_print *save)
 {
-	int	address;
+	char	*str;
 
-	nbr_hexa(address, 0);
+	str = va_arg(save->arg, char *);
+	ft_putstr_fd(str, 1);
+	return (ft_strlen(str));
 }
 
-static void	numhex(t_print *save, char caps)
-{}
-
-int format_conversion(t_print *save, char *format, int x)
+static int	decifunct(t_print *save)
 {
-	if (format[x] == 'c' || format[x] == 's')
-		stringfunct(save);
+	int		x;
+	char	*str;
+
+	x = va_arg(save->arg, int);
+	str = ft_itoa(x);
+	ft_putstr_fd(str, 1);
+	return (ft_strlen(str));
+}
+
+static int	pointfunct(t_print *save)
+{
+	//int	address;
+
+	//nbr_hexa(address, 0);
+}
+
+static int	percent(t_print *save)
+{
+	ft_putchar_fd('%', 1);
+	return (1);
+}
+
+static int	numhex(t_print *save, char caps)
+{
+	char	*str;
+
+	str = va_arg(save->arg, char *);
+	ft_putstr_fd(str, 1);
+	return (ft_strlen(str));
+}
+
+int	format_conversion(t_print *save, const char *format, int x)
+{
+	if (format[x] == 'c')
+		x += charfunct(save);
+	else if (format[x] == 's')
+		x += stringfunct(save);
 	else if (format[x] == 'p')
-		pointfunct(save);
+		x += pointfunct(save);
 	else if (format[x] == 'd' || format[x] == 'u')
-		decifunct(save);
+		x += decifunct(save);
 	else if (format[x] == 'x' || format[x] == 'X')
-		numhex(save, format[x]);
+		x += numhex(save, format[x]);
 	return (x);
 }
 
 int	get_format(t_print *save, char *format, int x)
 {
-	while (format[x] != 'u' && format[x] != 'd' && format[x] != 'c' &&
-			format[x] != 's' && format[x] != 'u' && format[x] != 'p' &&
-			format[x] != 'x' && format[x] != 'X')
+	while (format[x] != 'u' && format[x] != 'd' && format[x] != 'c'
+		&& format[x] != 's' && format[x] != 'u' && format[x] != 'p'
+		&& format[x] != 'x' && format[x] != 'X')
 	{
 		if (format[x] == '.')
 		{
@@ -106,7 +143,8 @@ int	get_format(t_print *save, char *format, int x)
 		else if (format[x] == '%')
 			x += percent(save);
 	}
-	return (format_conversion(save, format, x));
+	save->length = x + format_conversion(save, format, x);
+	return (x);
 }
 
 int	ft_printf(const char *format, ...)
@@ -125,9 +163,9 @@ int	ft_printf(const char *format, ...)
 	while (format[++x])
 	{
 		if (format[x] == '%')
-			x = get_format(save, format, x + 1);
+			x = get_format(save, (char *)format, x + 1);
 		else
-			count += write(1, format[x], sizeof(char));
+			count += write(1, &format[x], sizeof(char));
 	}
 	va_end(save->arg);
 	count += save->length;
@@ -137,26 +175,9 @@ int	ft_printf(const char *format, ...)
 
 int	main(int argc, char *argv[])
 {
-	char	*n;
-	size_t	count;
-	int		str;
+	char	a;
 
-	n = (char *) 'a';
-	str = printf("%p\n", &n);
-	printf("%u\n", str);
-	count = (size_t) & n;
-	ft_putstr_fd("0x", 1);
-	str = nbr_hexa(count, 3);
-	printf("\n");
-	printf("%u\n", str);
-	/*
-	if (argc < 2)
-	{
-		printf("0\n");
-		return (0);
-	}
-	pointfunct(argv[1]);
-	count = stringfunct(argv[1]);
-	printf("\n%u\n", (unsigned int)count);*/
+	a = 'a';
+	ft_printf("Hola %s %d\n", "Holaaaaaaa", 12345);
 	return (0);
 }

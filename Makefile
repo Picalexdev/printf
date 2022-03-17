@@ -23,8 +23,10 @@ ${NAME}:	${SRC}
 			ar rc $(NAME) $(OBJS)
 			${RM} *.o
 
-out:		${SRC}
+clone:		${SRC}
 			${GIT_LIBFT}
+
+out:		${SRC}
 			gcc libft/*.c libft/*.h ft_printf.h ft_printf.c
 			${RM} *.o *.a
 
